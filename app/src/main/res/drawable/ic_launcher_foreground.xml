@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Radiant Sun Rays & Sun Core in the upper half -->
+    <!-- Sun Core -->
+    <path
+        android:fillColor="#FBBF24"
+        android:pathData="M54,32m-11,0a11,11 0 1,0 22,0a11,11 0 1,0 -22,0" />
+    <!-- Sun Rays -->
+    <path
+        android:strokeColor="#F59E0B"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:pathData="M54,16v-4 M54,48v4 M38,32h-4 M70,32h4 M42.6,20.6l-2.8,-2.8 M65.4,43.4l2.8,2.8 M42.6,43.4l-2.8,2.8 M65.4,20.6l2.8,-2.8" />
+    
+    <!-- Solar Panels Base Perspective (Trapezoid) -->
+    <path
+        android:fillColor="#0284C7"
+        android:pathData="M34,54 L74,54 L82,82 L26,82 Z" />
+    
+    <!-- Solar Panel Grid Lines -->
+    <path
+        android:strokeColor="#E0F2FE"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"
+        android:pathData="M54,54 L54,82 M40,68 L68,68 M47,54 L44,82 M61,54 L64,82" />
+    
+    <!-- Energy Bolt Accent -->
+    <path
+        android:fillColor="#FDE047"
+        android:strokeColor="#B45309"
+        android:strokeWidth="0.8"
+        android:pathData="M56,48 L48,60 L53,60 L50,72 L60,58 L55,58 Z" />
+</vector>
