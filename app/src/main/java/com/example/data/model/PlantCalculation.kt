@@ -7,7 +7,14 @@ object PlantConstants {
     const val DC_CAPACITY_KW = 5407.5
     const val AC_CAPACITY_KW = 4000.0
     const val INVERTER_COUNT = 14
-    const val DEFAULT_MF = 5000.0
+
+    val WEATHER_OPTIONS = listOf(
+        "Sunny",
+        "Partly Cloudy",
+        "Cloudy",
+        "Cloudy with Light Rain",
+        "Rainy"
+    )
 }
 
 data class GenerationCalculationResult(
@@ -18,98 +25,150 @@ data class GenerationCalculationResult(
     val lossKwh: Double,
     val lossPercentage: Double,
     val isValid: Boolean,
-    val formattedReport: String = "",
     val validationIssues: List<String> = emptyList()
 )
 
+fun formatMeterValue(value: Double): String {
+    return String.format(Locale.US, "%.2f", value)
+}
+
+fun formatYield(value: Double): String {
+    return String.format(Locale.US, "%.2f", value)
+}
+
+fun formatLoss(value: Double): String {
+    return String.format(Locale.US, "%.2f", value)
+}
+
+fun buildShareReportText(
+    date: String,
+    todayPlantExp: Double,
+    prevPlantExp: Double,
+    todayPlantImp: Double,
+    prevPlantImp: Double,
+    todaySSExp: Double,
+    prevSSExp: Double,
+    todaySSImp: Double,
+    prevSSImp: Double,
+    plantGenKwh: Double,
+    ssGenKwh: Double,
+    plantYield: Double,
+    ssYield: Double,
+    lossPercentage: Double,
+    weather: String = "Cloudy whether 🌤️☀️"
+): String {
+    return """
+*sukhpar rushikesh solar ${PlantConstants.DC_CAPACITY_KW} KW dc*
+
+Date : $date
+
+*Plant End*
+Today import Unit :${formatMeterValue(todayPlantImp)}
+Today export unit :${formatMeterValue(todayPlantExp)}
+Previous import unit :${formatMeterValue(prevPlantImp)}
+Previous export unit :${formatMeterValue(prevPlantExp)}
+
+Total:${String.format(Locale.US, "%.0f", plantGenKwh)}kWh
+Unit/kw:${formatYield(plantYield)}kWh/kW
+
+*🧷 S/S End*
+Today export Unit :${formatMeterValue(todaySSExp)}
+Today import unit :${formatMeterValue(todaySSImp)}
+Previous export unit :${formatMeterValue(prevSSExp)}
+Previous import unit :${formatMeterValue(prevSSImp)}
+
+Total:${String.format(Locale.US, "%.0f", ssGenKwh)}kWh
+Unit/kW:${formatYield(ssYield)}kWh/kW
+
+*Loss:${formatLoss(lossPercentage)}%*
+$weather
+    """.trimIndent()
+}
+
 object PlantCalculationEngine {
 
+    fun formatMeterValue(value: Double): String = com.example.data.model.formatMeterValue(value)
+    fun formatYield(value: Double): String = com.example.data.model.formatYield(value)
+    fun formatLoss(value: Double): String = com.example.data.model.formatLoss(value)
+    fun buildShareReportText(
+        date: String,
+        todayPlantExp: Double,
+        prevPlantExp: Double,
+        todayPlantImp: Double,
+        prevPlantImp: Double,
+        todaySSExp: Double,
+        prevSSExp: Double,
+        todaySSImp: Double,
+        prevSSImp: Double,
+        plantGenKwh: Double,
+        ssGenKwh: Double,
+        plantYield: Double,
+        ssYield: Double,
+        lossPercentage: Double,
+        weather: String = "Cloudy whether 🌤️☀️"
+    ): String = com.example.data.model.buildShareReportText(
+        date, todayPlantExp, prevPlantExp, todayPlantImp, prevPlantImp,
+        todaySSExp, prevSSExp, todaySSImp, prevSSImp, plantGenKwh,
+        ssGenKwh, plantYield, ssYield, lossPercentage, weather
+    )
+
     fun calculate(
+        todayPlantImport: Double?,
         todayPlantExport: Double?,
+        previousPlantImport: Double?,
         previousPlantExport: Double?,
-        todayPlantImport: Double? = 0.0,
-        previousPlantImport: Double? = 0.0,
+        todaySSExport: Double?,
         todaySSImport: Double?,
+        previousSSExport: Double?,
         previousSSImport: Double?,
-        todaySSExport: Double? = 0.0,
-        previousSSExport: Double? = 0.0,
-        selectedDate: String = "29/10/2026",
-        weatherCondition: String = "Cloudy whether 🌤️☀️",
-        multiplier: Double = PlantConstants.DEFAULT_MF
+        isMwhUnit: Boolean = true
     ): GenerationCalculationResult {
         val issues = mutableListOf<String>()
 
-        if (todayPlantExport == null || previousPlantExport == null) {
-            issues.add("Plant End export readings are missing.")
-        }
-        if (todaySSImport == null || previousSSImport == null) {
-            issues.add("S/S End import readings are missing.")
+        if (todayPlantImport == null || todayPlantExport == null ||
+            previousPlantImport == null || previousPlantExport == null) {
+            issues.add("Plant End meter readings are incomplete.")
         }
 
-        if (issues.isNotEmpty()) {
-            return GenerationCalculationResult(
-                plantGenKwh = 0.0,
-                ssGenKwh = 0.0,
-                plantYield = 0.0,
-                ssYield = 0.0,
-                lossKwh = 0.0,
-                lossPercentage = 0.0,
-                isValid = false,
-                validationIssues = issues
-            )
+        if (todaySSExport == null || todaySSImport == null ||
+            previousSSExport == null || previousSSImport == null) {
+            issues.add("S/S End meter readings are incomplete.")
         }
 
-        val tPlantExp = todayPlantExport ?: 0.0
-        val pPlantExp = previousPlantExport ?: 0.0
         val tPlantImp = todayPlantImport ?: 0.0
+        val tPlantExp = todayPlantExport ?: 0.0
         val pPlantImp = previousPlantImport ?: 0.0
+        val pPlantExp = previousPlantExport ?: 0.0
 
-        val tSSImp = todaySSImport ?: 0.0
-        val pSSImp = previousSSImport ?: 0.0
         val tSSExp = todaySSExport ?: 0.0
+        val tSSImp = todaySSImport ?: 0.0
         val pSSExp = previousSSExport ?: 0.0
+        val pSSImp = previousSSImport ?: 0.0
 
-        // 1. Plant End Total Gen = (Today Export - Previous Export) * MF
+        // Multiplier: MF 5000 fix
+        val multiplier = if (isMwhUnit) 5000.0 else 1.0
+
+        // Plant Gen kWh = (Today Export - Previous Export) * MF
         val plantGenKwh = (tPlantExp - pPlantExp) * multiplier
 
-        // 2. S/S End Total Gen = (Today Import - Previous Import) * MF
+        // S/S Gen kWh = (Today Import - Previous Import) * MF
         val ssGenKwh = (tSSImp - pSSImp) * multiplier
 
-        // 3. DC Yield (kWh / kW)
-        val plantYield = if (plantGenKwh > 0) plantGenKwh / PlantConstants.DC_CAPACITY_KW else 0.0
-        val ssYield = if (ssGenKwh > 0) ssGenKwh / PlantConstants.DC_CAPACITY_KW else 0.0
+        // Plant DC Yield = Plant Gen / DC Capacity
+        val plantYield = if (PlantConstants.DC_CAPACITY_KW > 0.0 && plantGenKwh > 0.0) {
+            plantGenKwh / PlantConstants.DC_CAPACITY_KW
+        } else 0.0
 
-        // 4. Line Loss
+        // S/S DC Yield = S/S Gen / DC Capacity
+        val ssYield = if (PlantConstants.DC_CAPACITY_KW > 0.0 && ssGenKwh > 0.0) {
+            ssGenKwh / PlantConstants.DC_CAPACITY_KW
+        } else 0.0
+
+        // Line Loss
         val lossKwh = plantGenKwh - ssGenKwh
-        val lossPercentage = if (plantGenKwh > 0) (lossKwh / plantGenKwh) * 100.0 else 0.0
-
-        // Generate exact WhatsApp / Text Report format
-        val report = """
-*sukhpar rushikesh solar ${PlantConstants.DC_CAPACITY_KW} KW dc*
-
-Date : $selectedDate
-
-*Plant End*
-Today import Unit :${String.format(Locale.US, "%.2f", tPlantImp)}
-Today export unit :${String.format(Locale.US, "%.2f", tPlantExp)}
-Previous import unit :${String.format(Locale.US, "%.2f", pPlantImp)}
-Previous export unit :${String.format(Locale.US, "%.2f", pPlantExp)}
-
-Total:${String.format(Locale.US, "%.0f", plantGenKwh)}kWh
-Unit/kw:${String.format(Locale.US, "%.2f", plantYield)}kWh/kW
-
-*🧷 S/S End*
-Today export Unit :${String.format(Locale.US, "%.2f", tSSExp)}
-Today import unit :${String.format(Locale.US, "%.2f", tSSImp)}
-Previous export unit :${String.format(Locale.US, "%.2f", pSSExp)}
-Previous import unit :${String.format(Locale.US, "%.2f", pSSImp)}
-
-Total:${String.format(Locale.US, "%.0f", ssGenKwh)}kWh
-Unit/kW:${String.format(Locale.US, "%.2f", ssYield)}kWh/kW
-
-*Loss:${String.format(Locale.US, "%.2f", lossPercentage)}%*
-$weatherCondition
-        """.trimIndent()
+        val lossPercentage = if (plantGenKwh > 0.0) {
+            (lossKwh / plantGenKwh) * 100.0
+        } else 0.0
 
         return GenerationCalculationResult(
             plantGenKwh = plantGenKwh,
@@ -118,8 +177,8 @@ $weatherCondition
             ssYield = ssYield,
             lossKwh = lossKwh,
             lossPercentage = lossPercentage,
-            isValid = true,
-            formattedReport = report
+            isValid = issues.isEmpty(),
+            validationIssues = issues
         )
     }
 }
