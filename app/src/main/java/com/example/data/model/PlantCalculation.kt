@@ -18,37 +18,38 @@ object PlantConstants {
 }
 
 data class GenerationCalculationResult(
-    val plantGenKwh: Double,
-    val ssGenKwh: Double,
-    val plantYield: Double,
-    val ssYield: Double,
-    val lossKwh: Double,
-    val lossPercentage: Double,
-    val isValid: Boolean,
+    val plantGenKwh: Double = 0.0,
+    val ssGenKwh: Double = 0.0,
+    val plantYield: Double = 0.0,
+    val ssYield: Double = 0.0,
+    val lossKwh: Double = 0.0,
+    val lossPercentage: Double = 0.0,
+    val isValid: Boolean = true,
     val validationIssues: List<String> = emptyList()
 )
 
-// Global Helper Functions (Top-Level)
-fun formatMeterValue(value: Double): String = String.format(Locale.US, "%.2f", value)
-fun formatYield(value: Double): String = String.format(Locale.US, "%.2f", value)
-fun formatLoss(value: Double): String = String.format(Locale.US, "%.2f", value)
-fun formatGeneration(value: Double): String = String.format(Locale.US, "%.0f", value)
+// Formatting Helpers
+fun formatMeterValue(value: Double?): String = String.format(Locale.US, "%.2f", value ?: 0.0)
+fun formatYield(value: Double?): String = String.format(Locale.US, "%.2f", value ?: 0.0)
+fun formatLoss(value: Double?): String = String.format(Locale.US, "%.2f", value ?: 0.0)
+fun formatGeneration(value: Double?): String = String.format(Locale.US, "%.0f", value ?: 0.0)
 
+// Report Format Functions
 fun buildExactReportText(
-    date: String,
-    todayPlantExp: Double,
-    prevPlantExp: Double,
-    todayPlantImp: Double,
-    prevPlantImp: Double,
-    todaySSExp: Double,
-    prevSSExp: Double,
-    todaySSImp: Double,
-    prevSSImp: Double,
-    plantGenKwh: Double,
-    ssGenKwh: Double,
-    plantYield: Double,
-    ssYield: Double,
-    lossPercentage: Double,
+    date: String = "",
+    todayPlantExp: Double = 0.0,
+    prevPlantExp: Double = 0.0,
+    todayPlantImp: Double = 0.0,
+    prevPlantImp: Double = 0.0,
+    todaySSExp: Double = 0.0,
+    prevSSExp: Double = 0.0,
+    todaySSImp: Double = 0.0,
+    prevSSImp: Double = 0.0,
+    plantGenKwh: Double = 0.0,
+    ssGenKwh: Double = 0.0,
+    plantYield: Double = 0.0,
+    ssYield: Double = 0.0,
+    lossPercentage: Double = 0.0,
     weather: String = "Cloudy whether 🌤️☀️"
 ): String {
     return """
@@ -79,131 +80,233 @@ $weather
     """.trimIndent()
 }
 
-fun buildShareReportText(
-    date: String,
-    todayPlantExp: Double,
-    prevPlantExp: Double,
-    todayPlantImp: Double,
-    prevPlantImp: Double,
-    todaySSExp: Double,
-    prevSSExp: Double,
-    todaySSImp: Double,
-    prevSSImp: Double,
-    plantGenKwh: Double,
-    ssGenKwh: Double,
-    plantYield: Double,
-    ssYield: Double,
-    lossPercentage: Double,
+fun buildExactReportText(
+    todayPlantExp: Double = 0.0,
+    prevPlantExp: Double = 0.0,
+    todayPlantImp: Double = 0.0,
+    prevPlantImp: Double = 0.0,
+    todaySSExp: Double = 0.0,
+    prevSSExp: Double = 0.0,
+    todaySSImp: Double = 0.0,
+    prevSSImp: Double = 0.0,
+    plantGenKwh: Double = 0.0,
+    ssGenKwh: Double = 0.0,
+    plantYield: Double = 0.0,
+    ssYield: Double = 0.0,
+    lossPercentage: Double = 0.0,
+    date: String = "",
     weather: String = "Cloudy whether 🌤️☀️"
 ): String = buildExactReportText(
-    date, todayPlantExp, prevPlantExp, todayPlantImp, prevPlantImp,
-    todaySSExp, prevSSExp, todaySSImp, prevSSImp, plantGenKwh,
-    ssGenKwh, plantYield, ssYield, lossPercentage, weather
+    date = date,
+    todayPlantExp = todayPlantExp,
+    prevPlantExp = prevPlantExp,
+    todayPlantImp = todayPlantImp,
+    prevPlantImp = prevPlantImp,
+    todaySSExp = todaySSExp,
+    prevSSExp = prevSSExp,
+    todaySSImp = todaySSImp,
+    prevSSImp = prevSSImp,
+    plantGenKwh = plantGenKwh,
+    ssGenKwh = ssGenKwh,
+    plantYield = plantYield,
+    ssYield = ssYield,
+    lossPercentage = lossPercentage,
+    weather = weather
+)
+
+fun buildShareReportText(
+    date: String = "",
+    todayPlantExp: Double = 0.0,
+    prevPlantExp: Double = 0.0,
+    todayPlantImp: Double = 0.0,
+    prevPlantImp: Double = 0.0,
+    todaySSExp: Double = 0.0,
+    prevSSExp: Double = 0.0,
+    todaySSImp: Double = 0.0,
+    prevSSImp: Double = 0.0,
+    plantGenKwh: Double = 0.0,
+    ssGenKwh: Double = 0.0,
+    plantYield: Double = 0.0,
+    ssYield: Double = 0.0,
+    lossPercentage: Double = 0.0,
+    weather: String = "Cloudy whether 🌤️☀️"
+): String = buildExactReportText(
+    date = date,
+    todayPlantExp = todayPlantExp,
+    prevPlantExp = prevPlantExp,
+    todayPlantImp = todayPlantImp,
+    prevPlantImp = prevPlantImp,
+    todaySSExp = todaySSExp,
+    prevSSExp = prevSSExp,
+    todaySSImp = todaySSImp,
+    prevSSImp = prevSSImp,
+    plantGenKwh = plantGenKwh,
+    ssGenKwh = ssGenKwh,
+    plantYield = plantYield,
+    ssYield = ssYield,
+    lossPercentage = lossPercentage,
+    weather = weather
 )
 
 object PlantCalculationEngine {
 
-    fun formatMeterValue(value: Double): String = com.example.data.model.formatMeterValue(value)
-    fun formatYield(value: Double): String = com.example.data.model.formatYield(value)
-    fun formatLoss(value: Double): String = com.example.data.model.formatLoss(value)
-    fun formatGeneration(value: Double): String = com.example.data.model.formatGeneration(value)
+    fun formatMeterValue(value: Double?): String = com.example.data.model.formatMeterValue(value)
+    fun formatYield(value: Double?): String = com.example.data.model.formatYield(value)
+    fun formatLoss(value: Double?): String = com.example.data.model.formatLoss(value)
+    fun formatGeneration(value: Double?): String = com.example.data.model.formatGeneration(value)
 
     fun buildExactReportText(
-        date: String,
-        todayPlantExp: Double,
-        prevPlantExp: Double,
-        todayPlantImp: Double,
-        prevPlantImp: Double,
-        todaySSExp: Double,
-        prevSSExp: Double,
-        todaySSImp: Double,
-        prevSSImp: Double,
-        plantGenKwh: Double,
-        ssGenKwh: Double,
-        plantYield: Double,
-        ssYield: Double,
-        lossPercentage: Double,
+        date: String = "",
+        todayPlantExp: Double = 0.0,
+        prevPlantExp: Double = 0.0,
+        todayPlantImp: Double = 0.0,
+        prevPlantImp: Double = 0.0,
+        todaySSExp: Double = 0.0,
+        prevSSExp: Double = 0.0,
+        todaySSImp: Double = 0.0,
+        prevSSImp: Double = 0.0,
+        plantGenKwh: Double = 0.0,
+        ssGenKwh: Double = 0.0,
+        plantYield: Double = 0.0,
+        ssYield: Double = 0.0,
+        lossPercentage: Double = 0.0,
         weather: String = "Cloudy whether 🌤️☀️"
     ): String = com.example.data.model.buildExactReportText(
-        date, todayPlantExp, prevPlantExp, todayPlantImp, prevPlantImp,
-        todaySSExp, prevSSExp, todaySSImp, prevSSImp, plantGenKwh,
-        ssGenKwh, plantYield, ssYield, lossPercentage, weather
+        date = date,
+        todayPlantExp = todayPlantExp,
+        prevPlantExp = prevPlantExp,
+        todayPlantImp = todayPlantImp,
+        prevPlantImp = prevPlantImp,
+        todaySSExp = todaySSExp,
+        prevSSExp = prevSSExp,
+        todaySSImp = todaySSImp,
+        prevSSImp = prevSSImp,
+        plantGenKwh = plantGenKwh,
+        ssGenKwh = ssGenKwh,
+        plantYield = plantYield,
+        ssYield = ssYield,
+        lossPercentage = lossPercentage,
+        weather = weather
+    )
+
+    fun buildExactReportText(
+        todayPlantExp: Double = 0.0,
+        prevPlantExp: Double = 0.0,
+        todayPlantImp: Double = 0.0,
+        prevPlantImp: Double = 0.0,
+        todaySSExp: Double = 0.0,
+        prevSSExp: Double = 0.0,
+        todaySSImp: Double = 0.0,
+        prevSSImp: Double = 0.0,
+        plantGenKwh: Double = 0.0,
+        ssGenKwh: Double = 0.0,
+        plantYield: Double = 0.0,
+        ssYield: Double = 0.0,
+        lossPercentage: Double = 0.0,
+        date: String = "",
+        weather: String = "Cloudy whether 🌤️☀️"
+    ): String = com.example.data.model.buildExactReportText(
+        date = date,
+        todayPlantExp = todayPlantExp,
+        prevPlantExp = prevPlantExp,
+        todayPlantImp = todayPlantImp,
+        prevPlantImp = prevPlantImp,
+        todaySSExp = todaySSExp,
+        prevSSExp = prevSSExp,
+        todaySSImp = todaySSImp,
+        prevSSImp = prevSSImp,
+        plantGenKwh = plantGenKwh,
+        ssGenKwh = ssGenKwh,
+        plantYield = plantYield,
+        ssYield = ssYield,
+        lossPercentage = lossPercentage,
+        weather = weather
     )
 
     fun buildShareReportText(
-        date: String,
-        todayPlantExp: Double,
-        prevPlantExp: Double,
-        todayPlantImp: Double,
-        prevPlantImp: Double,
-        todaySSExp: Double,
-        prevSSExp: Double,
-        todaySSImp: Double,
-        prevSSImp: Double,
-        plantGenKwh: Double,
-        ssGenKwh: Double,
-        plantYield: Double,
-        ssYield: Double,
-        lossPercentage: Double,
+        date: String = "",
+        todayPlantExp: Double = 0.0,
+        prevPlantExp: Double = 0.0,
+        todayPlantImp: Double = 0.0,
+        prevPlantImp: Double = 0.0,
+        todaySSExp: Double = 0.0,
+        prevSSExp: Double = 0.0,
+        todaySSImp: Double = 0.0,
+        prevSSImp: Double = 0.0,
+        plantGenKwh: Double = 0.0,
+        ssGenKwh: Double = 0.0,
+        plantYield: Double = 0.0,
+        ssYield: Double = 0.0,
+        lossPercentage: Double = 0.0,
         weather: String = "Cloudy whether 🌤️☀️"
     ): String = com.example.data.model.buildExactReportText(
-        date, todayPlantExp, prevPlantExp, todayPlantImp, prevPlantImp,
-        todaySSExp, prevSSExp, todaySSImp, prevSSImp, plantGenKwh,
-        ssGenKwh, plantYield, ssYield, lossPercentage, weather
+        date = date,
+        todayPlantExp = todayPlantExp,
+        prevPlantExp = prevPlantExp,
+        todayPlantImp = todayPlantImp,
+        prevPlantImp = prevPlantImp,
+        todaySSExp = todaySSExp,
+        prevSSExp = prevSSExp,
+        todaySSImp = todaySSImp,
+        prevSSImp = prevSSImp,
+        plantGenKwh = plantGenKwh,
+        ssGenKwh = ssGenKwh,
+        plantYield = plantYield,
+        ssYield = ssYield,
+        lossPercentage = lossPercentage,
+        weather = weather
     )
 
     fun calculate(
-        todayPlantImport: Double?,
+        todayPlantImport: Double? = 0.0,
         todayPlantExport: Double?,
-        previousPlantImport: Double?,
+        previousPlantImport: Double? = 0.0,
         previousPlantExport: Double?,
-        todaySSExport: Double?,
+        todaySSExport: Double? = 0.0,
         todaySSImport: Double?,
-        previousSSExport: Double?,
+        previousSSExport: Double? = 0.0,
         previousSSImport: Double?,
-        isMwhUnit: Boolean = true
+        isMwh: Boolean = true,
+        isMwhUnit: Boolean = true,
+        curtailmentPercentage: Double? = 0.0,
+        curtailmentTime: Double? = 0.0,
+        relaxWeatherUsage: Double? = 0.0,
+        relaxWeatherTime: Double? = 0.0
     ): GenerationCalculationResult {
         val issues = mutableListOf<String>()
 
-        if (todayPlantImport == null || todayPlantExport == null ||
-            previousPlantImport == null || previousPlantExport == null) {
-            issues.add("Plant End meter readings are incomplete.")
+        if (todayPlantExport == null || previousPlantExport == null) {
+            issues.add("Plant End export readings are incomplete.")
+        }
+        if (todaySSImport == null || previousSSImport == null) {
+            issues.add("S/S End import readings are incomplete.")
         }
 
-        if (todaySSExport == null || todaySSImport == null ||
-            previousSSExport == null || previousSSImport == null) {
-            issues.add("S/S End meter readings are incomplete.")
-        }
-
-        val tPlantImp = todayPlantImport ?: 0.0
         val tPlantExp = todayPlantExport ?: 0.0
-        val pPlantImp = previousPlantImport ?: 0.0
         val pPlantExp = previousPlantExport ?: 0.0
-
-        val tSSExp = todaySSExport ?: 0.0
         val tSSImp = todaySSImport ?: 0.0
-        val pSSExp = previousSSExport ?: 0.0
         val pSSImp = previousSSImport ?: 0.0
 
-        // Multiplier: MF 5000 fix
-        val multiplier = if (isMwhUnit) 5000.0 else 1.0
+        // Multiplier: MF 5000 Fix
+        val multiplier = 5000.0
 
-        // 1. Plant End Total Gen = (Today Export - Previous Export) * MF
+        // 1. Plant Gen kWh = (Today Export - Prev Export) * 5000
         val plantGenKwh = (tPlantExp - pPlantExp) * multiplier
 
-        // 2. S/S End Total Gen = (Today Import - Previous Import) * MF
+        // 2. S/S Gen kWh = (Today Import - Prev Import) * 5000
         val ssGenKwh = (tSSImp - pSSImp) * multiplier
 
-        // 3. DC Yield (kWh / kW)
+        // 3. Plant DC Yield = Plant Gen / 5407.5
         val plantYield = if (PlantConstants.DC_CAPACITY_KW > 0.0 && plantGenKwh > 0.0) {
             plantGenKwh / PlantConstants.DC_CAPACITY_KW
         } else 0.0
 
+        // 4. S/S DC Yield = S/S Gen / 5407.5
         val ssYield = if (PlantConstants.DC_CAPACITY_KW > 0.0 && ssGenKwh > 0.0) {
             ssGenKwh / PlantConstants.DC_CAPACITY_KW
         } else 0.0
 
-        // 4. Line Loss
+        // 5. Line Loss
         val lossKwh = plantGenKwh - ssGenKwh
         val lossPercentage = if (plantGenKwh > 0.0) {
             (lossKwh / plantGenKwh) * 100.0
